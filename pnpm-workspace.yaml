@@ -1,0 +1,6 @@
+packages:
+  - "apps/*"        # ← every folder inside apps/ is its own workspace
+  - "packages/*"    # ← optional shared libs later
+
+onlyBuiltDependencies:
+  - "@prisma/client"

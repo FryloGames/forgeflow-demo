@@ -1,7 +1,7 @@
 // packages/database/prisma/schema.prisma
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL") // Prisma will read the .env you created
+  url      = env("DATABASE_URL")  // Prisma will read the .env you created
 }
 
 generator client {
@@ -13,28 +13,28 @@ generator client {
 // ============================================================================
 
 model User {
-  id          String       @id @default(cuid())
-  email       String       @unique
+  id          String   @id @default(cuid())
+  email       String   @unique
   firstName   String
   lastName    String
   phone       String?
   avatar      String?
   roleId      String
   companyId   String?
-  isActive    Boolean      @default(true)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   welderCerts WelderCert[]
 
-  role    Role     @relation(fields: [roleId], references: [id])
-  company Company? @relation(fields: [companyId], references: [id])
-
+  role        Role     @relation(fields: [roleId], references: [id])
+  company     Company? @relation(fields: [companyId], references: [id])
+  
   // Relations
   timecards   Timecard[]
   weldPasses  WeldPass[]
   inspections Inspection[]
   sessions    Session[]
-  createdJobs Job[]        @relation("JobCreatedBy")
+  createdJobs Job[]     @relation("JobCreatedBy")
   truckTrips  TruckTrip[]
 
   @@map("users")
@@ -43,8 +43,8 @@ model User {
 model Role {
   id          String @id @default(cuid())
   name        String @unique // Owner, PM, ShopLead, Welder, Apprentice, Inspector, Customer
-  permissions Json // Array of permission strings
-
+  permissions Json   // Array of permission strings
+  
   users User[]
 
   @@map("roles")
@@ -63,7 +63,7 @@ model Session {
 }
 
 model Company {
-  id       String  @id @default(cuid())
+  id       String @id @default(cuid())
   name     String
   address  String?
   city     String?
@@ -99,33 +99,33 @@ model Job {
   createdById String
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  inspections Inspection[]
 
-  customer  Customer @relation(fields: [customerId], references: [id])
-  createdBy User     @relation("JobCreatedBy", fields: [createdById], references: [id])
-  quote     Quote?   @relation(fields: [quoteId], references: [id])
-
+  customer    Customer    @relation(fields: [customerId], references: [id])
+  createdBy   User        @relation("JobCreatedBy", fields: [createdById], references: [id])
+  quote       Quote?      @relation(fields: [quoteId], references: [id])
+  
   // Relations
-  phases     JobPhase[]
-  drawings   Drawing[]
-  bomItems   BomItem[]
-  timecards  Timecard[]
-  invoices   Invoice[]
-  workOrders WorkOrder[]
-  Inspection Inspection[]
+  phases      JobPhase[]
+  drawings    Drawing[]
+  bomItems    BomItem[]
+  timecards   Timecard[]
+  invoices    Invoice[]
+  workOrders  WorkOrder[]
 
   @@map("jobs")
 }
 
 model JobPhase {
-  id        String      @id @default(cuid())
-  jobId     String
-  name      String // Cut, FitUp, Weld, Grind, Paint, QA, Delivery
-  sequence  Int
-  status    PhaseStatus @default(PENDING)
-  startDate DateTime?
-  endDate   DateTime?
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id          String      @id @default(cuid())
+  jobId       String
+  name        String      // Cut, FitUp, Weld, Grind, Paint, QA, Delivery
+  sequence    Int
+  status      PhaseStatus @default(PENDING)
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
   job   Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
   tasks Task[]
@@ -135,15 +135,15 @@ model JobPhase {
 }
 
 model Task {
-  id             String     @id @default(cuid())
-  phaseId        String
-  title          String
-  description    String?
-  status         TaskStatus @default(TODO)
+  id          String     @id @default(cuid())
+  phaseId     String
+  title       String
+  description String?
+  status      TaskStatus @default(TODO)
   estimatedHours Float?
   actualHours    Float?
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 
   phase     JobPhase   @relation(fields: [phaseId], references: [id], onDelete: Cascade)
   timecards Timecard[]
@@ -156,16 +156,16 @@ model Task {
 // ============================================================================
 
 model Drawing {
-  id         String    @id @default(cuid())
-  jobId      String
-  filename   String
-  fileUrl    String
-  fileType   String // DWG, DXF, PDF
-  revision   String    @default("A")
-  isApproved Boolean   @default(false)
-  approvedAt DateTime?
-  approvedBy String?
-  createdAt  DateTime  @default(now())
+  id           String  @id @default(cuid())
+  jobId        String
+  filename     String
+  fileUrl      String
+  fileType     String  // DWG, DXF, PDF
+  revision     String  @default("A")
+  isApproved   Boolean @default(false)
+  approvedAt   DateTime?
+  approvedBy   String?
+  createdAt    DateTime @default(now())
 
   job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
@@ -173,15 +173,15 @@ model Drawing {
 }
 
 model BomItem {
-  id          String   @id @default(cuid())
+  id          String  @id @default(cuid())
   jobId       String
   materialId  String
   description String
   quantity    Float
-  unit        String // kg, m, pcs
+  unit        String  // kg, m, pcs
   unitCost    Float?
   totalCost   Float?
-  isOrdered   Boolean  @default(false)
+  isOrdered   Boolean @default(false)
   createdAt   DateTime @default(now())
 
   job      Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
@@ -195,32 +195,32 @@ model BomItem {
 // ============================================================================
 
 model Material {
-  id              String   @id @default(cuid())
-  code            String   @unique
+  id              String @id @default(cuid())
+  code            String @unique
   description     String
   category        String // Plate, Pipe, Rod, Consumable
   grade           String? // A36, 316SS, 6061-T6
   size            String? // 12x1/2, 4"SCH40
-  unit            String // kg, m, pcs
+  unit            String  // kg, m, pcs
   unitCost        Float?
-  qtyOnHand       Float    @default(0)
-  qtyReserved     Float    @default(0)
+  qtyOnHand       Float   @default(0)
+  qtyReserved     Float   @default(0)
   reorderPoint    Float?
   preferredVendor String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
   // Relations
-  bomItems    BomItem[]
-  heatBatches HeatBatch[]
-  stockMoves  StockMovement[]
-  poItems     PurchaseOrderItem[]
+  bomItems     BomItem[]
+  heatBatches  HeatBatch[]
+  stockMoves   StockMovement[]
+  poItems      PurchaseOrderItem[]
 
   @@map("materials")
 }
 
 model HeatBatch {
-  id         String   @id @default(cuid())
+  id         String @id @default(cuid())
   materialId String
   heatNumber String
   mtrUrl     String? // MTR PDF URL
@@ -236,8 +236,8 @@ model HeatBatch {
 }
 
 model StockLocation {
-  id          String  @id @default(cuid())
-  name        String  @unique
+  id          String @id @default(cuid())
+  name        String @unique
   description String?
   isActive    Boolean @default(true)
 
@@ -256,14 +256,14 @@ model StockMovement {
   toLocationId   String?
   quantity       Float
   unit           String
-  movementType   String // RECEIVE, ISSUE, TRANSFER, ADJUST
+  movementType   String   // RECEIVE, ISSUE, TRANSFER, ADJUST
   reference      String?
   notes          String?
   createdAt      DateTime @default(now())
 
   material     Material       @relation(fields: [materialId], references: [id])
   fromLocation StockLocation? @relation("LocationFrom", fields: [fromLocationId], references: [id])
-  toLocation   StockLocation? @relation("LocationTo", fields: [toLocationId], references: [id])
+  toLocation   StockLocation? @relation("LocationTo",   fields: [toLocationId],   references: [id])
 
   @@map("stock_movements")
 }
@@ -285,9 +285,9 @@ model Timecard {
   isApproved Boolean   @default(false)
   createdAt  DateTime  @default(now())
 
-  user User     @relation(fields: [userId], references: [id])
-  job  Job?     @relation(fields: [jobId], references: [id])
-  task Task?    @relation(fields: [taskId], references: [id])
+  user User  @relation(fields: [userId], references: [id])
+  job  Job?  @relation(fields: [jobId], references: [id])
+  task Task? @relation(fields: [taskId], references: [id])
   wps  WpsSpec? @relation(fields: [wpsId], references: [id])
 
   weldPasses WeldPass[]
@@ -296,18 +296,18 @@ model Timecard {
 }
 
 model WeldPass {
-  id          String   @id @default(cuid())
-  timecardId  String
-  welderId    String
-  wpsId       String
-  jointNumber String?
-  passNumber  Int
-  amps        Float?
-  volts       Float?
-  wireFeed    Float?
-  travelSpeed Float?
-  notes       String?
-  createdAt   DateTime @default(now())
+  id           String @id @default(cuid())
+  timecardId   String
+  welderId     String
+  wpsId        String
+  jointNumber  String?
+  passNumber   Int
+  amps         Float?
+  volts        Float?
+  wireFeed     Float?
+  travelSpeed  Float?
+  notes        String?
+  createdAt    DateTime @default(now())
 
   timecard Timecard @relation(fields: [timecardId], references: [id], onDelete: Cascade)
   welder   User     @relation(fields: [welderId], references: [id])
@@ -321,27 +321,27 @@ model WeldPass {
 // ============================================================================
 
 model WpsSpec {
-  id            String    @id @default(cuid())
-  code          String    @unique // W47.1-GMAW-Flat
+  id            String   @id @default(cuid())
+  code          String   @unique // W47.1-GMAW-Flat
   title         String
-  process       String // GMAW, SMAW, GTAW
-  materialGroup String // Steel, SS, Aluminum
+  process       String   // GMAW, SMAW, GTAW
+  materialGroup String   // Steel, SS, Aluminum
   positions     String[] // 1G, 2G, 3G, 4G
-  thickness     String? // 6-25mm
+  thickness     String?  // 6-25mm
   pdfUrl        String?
-  isActive      Boolean   @default(true)
+  isActive      Boolean  @default(true)
   expiresAt     DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   // Parameters as JSON
   parameters Json? // { amps: [100,150], volts: [18,22], wireFeed: 200 }
 
   // Relations
-  pqrTests    PqrTest[]
-  welderCerts WelderCert[]
-  timecards   Timecard[]
-  weldPasses  WeldPass[]
+  pqrTests     PqrTest[]
+  welderCerts  WelderCert[]
+  timecards    Timecard[]
+  weldPasses   WeldPass[]
 
   @@map("wps_specs")
 }
@@ -349,8 +349,8 @@ model WpsSpec {
 model PqrTest {
   id        String   @id @default(cuid())
   wpsId     String
-  testType  String // Tensile, Bend, Impact, Macro
-  result    String // PASS, FAIL
+  testType  String   // Tensile, Bend, Impact, Macro
+  result    String   // PASS, FAIL
   value     Float?
   unit      String?
   testDate  DateTime
@@ -364,15 +364,15 @@ model PqrTest {
 }
 
 model WelderCert {
-  id         String   @id @default(cuid())
-  welderId   String   @map("welder_id")
-  wpsId      String   @map("wps_id")
-  certNumber String   @unique
-  issuedAt   DateTime
-  expiresAt  DateTime
-  isActive   Boolean  @default(true)
-  certPdfUrl String?
-  createdAt  DateTime @default(now())
+  id          String   @id @default(cuid())
+  welderId    String   @map("welder_id")
+  wpsId       String   @map("wps_id")
+  certNumber  String   @unique
+  issuedAt    DateTime
+  expiresAt   DateTime
+  isActive    Boolean  @default(true)
+  certPdfUrl  String?
+  createdAt   DateTime @default(now())
 
   welder User    @relation(fields: [welderId], references: [id])
   wps    WpsSpec @relation(fields: [wpsId], references: [id])
@@ -386,28 +386,28 @@ model WelderCert {
 // ============================================================================
 
 model Inspection {
-  id             String         @id @default(cuid())
-  jobId          String?
-  inspectorId    String?
+  id           String         @id @default(cuid())
+  jobId        String?
+  inspectorId  String?
   inspectionType InspectionType
-  jointNumbers   String[]
-  result         String // ACCEPT, REJECT, REPAIR
-  notes          String?
-  reportUrl      String?
-  inspectedAt    DateTime
-  createdAt      DateTime       @default(now())
+  jointNumbers String[]
+  result       String         // ACCEPT, REJECT, REPAIR
+  notes        String?
+  reportUrl    String?
+  inspectedAt  DateTime
+  createdAt    DateTime       @default(now())
 
   job       Job?  @relation(fields: [jobId], references: [id])
   inspector User? @relation(fields: [inspectorId], references: [id])
 
-  weldLogs   WeldLog[]
+  weldLogs  WeldLog[]
   repairLogs RepairLog[]
 
   @@map("inspections")
 }
 
 model WeldLog {
-  id           String   @id @default(cuid())
+  id           String @id @default(cuid())
   inspectionId String
   weldNumber   String
   jointId      String?
@@ -424,16 +424,16 @@ model WeldLog {
 }
 
 model RepairLog {
-  id           String    @id @default(cuid())
+  id           String   @id @default(cuid())
   inspectionId String
   weldNumber   String
   defectType   String
   repairMethod String
   repairedBy   String?
   repairedAt   DateTime?
-  isCompleted  Boolean   @default(false)
+  isCompleted  Boolean  @default(false)
   notes        String?
-  createdAt    DateTime  @default(now())
+  createdAt    DateTime @default(now())
 
   inspection Inspection @relation(fields: [inspectionId], references: [id])
 
@@ -445,7 +445,7 @@ model RepairLog {
 // ============================================================================
 
 model Customer {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   companyId String?
   name      String
   email     String?
@@ -455,20 +455,20 @@ model Customer {
   province  String?
   postal    String?
   gstHst    String?
-  terms     Int      @default(30) // Payment terms in days
-  isActive  Boolean  @default(true)
+  terms     Int     @default(30) // Payment terms in days
+  isActive  Boolean @default(true)
   createdAt DateTime @default(now())
 
-  company  Company?  @relation(fields: [companyId], references: [id])
-  jobs     Job[]
-  quotes   Quote[]
+  company Company? @relation(fields: [companyId], references: [id])
+  jobs    Job[]
+  quotes  Quote[]
   invoices Invoice[]
 
   @@map("customers")
 }
 
 model Vendor {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   companyId String?
   name      String
   email     String?
@@ -477,11 +477,11 @@ model Vendor {
   city      String?
   province  String?
   postal    String?
-  terms     Int      @default(30)
-  isActive  Boolean  @default(true)
+  terms     Int     @default(30)
+  isActive  Boolean @default(true)
   createdAt DateTime @default(now())
 
-  company        Company?        @relation(fields: [companyId], references: [id])
+  company        Company? @relation(fields: [companyId], references: [id])
   purchaseOrders PurchaseOrder[]
 
   @@map("vendors")
@@ -492,18 +492,18 @@ model Vendor {
 // ============================================================================
 
 model PurchaseOrder {
-  id         String    @id @default(cuid())
-  poNumber   String    @unique
-  vendorId   String
-  status     PoStatus  @default(DRAFT)
-  orderDate  DateTime  @default(now())
-  requiredBy DateTime?
-  subtotal   Float     @default(0)
-  tax        Float     @default(0)
-  total      Float     @default(0)
-  notes      String?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  id          String    @id @default(cuid())
+  poNumber    String    @unique
+  vendorId    String
+  status      PoStatus  @default(DRAFT)
+  orderDate   DateTime  @default(now())
+  requiredBy  DateTime?
+  subtotal    Float     @default(0)
+  tax         Float     @default(0)
+  total       Float     @default(0)
+  notes       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   vendor Vendor              @relation(fields: [vendorId], references: [id])
   items  PurchaseOrderItem[]
@@ -512,16 +512,16 @@ model PurchaseOrder {
 }
 
 model PurchaseOrderItem {
-  id          String   @id @default(cuid())
-  poId        String
-  materialId  String
-  description String
-  quantity    Float
-  unit        String
-  unitCost    Float
-  totalCost   Float
-  qtyReceived Float    @default(0)
-  createdAt   DateTime @default(now())
+  id           String @id @default(cuid())
+  poId         String
+  materialId   String
+  description  String
+  quantity     Float
+  unit         String
+  unitCost     Float
+  totalCost    Float
+  qtyReceived  Float  @default(0)
+  createdAt    DateTime @default(now())
 
   po       PurchaseOrder @relation(fields: [poId], references: [id], onDelete: Cascade)
   material Material      @relation(fields: [materialId], references: [id])
@@ -534,17 +534,17 @@ model PurchaseOrderItem {
 // ============================================================================
 
 model Quote {
-  id          String      @id @default(cuid())
-  quoteNumber String      @unique
-  customerId  String
-  title       String
-  subtotal    Float       @default(0)
-  tax         Float       @default(0)
-  total       Float       @default(0)
-  validUntil  DateTime?
-  status      QuoteStatus @default(DRAFT)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id         String      @id @default(cuid())
+  quoteNumber String     @unique
+  customerId String
+  title      String
+  subtotal   Float       @default(0)
+  tax        Float       @default(0)
+  total      Float       @default(0)
+  validUntil DateTime?
+  status     QuoteStatus @default(DRAFT)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
 
   customer Customer    @relation(fields: [customerId], references: [id])
   items    QuoteItem[]
@@ -554,7 +554,7 @@ model Quote {
 }
 
 model QuoteItem {
-  id          String   @id @default(cuid())
+  id          String @id @default(cuid())
   quoteId     String
   description String
   quantity    Float
@@ -593,7 +593,7 @@ model Invoice {
 }
 
 model InvoiceItem {
-  id          String   @id @default(cuid())
+  id          String @id @default(cuid())
   invoiceId   String
   description String
   quantity    Float
@@ -612,7 +612,7 @@ model Payment {
   invoiceId     String
   amount        Float
   paymentMethod PaymentMethod
-  reference     String? // Cheque #, Stripe ID
+  reference     String?       // Cheque #, Stripe ID
   paidAt        DateTime      @default(now())
   createdAt     DateTime      @default(now())
 
@@ -626,15 +626,15 @@ model Payment {
 // ============================================================================
 
 model Equipment {
-  id           String        @id @default(cuid())
+  id           String          @id @default(cuid())
   name         String
   category     EquipmentType
   manufacturer String?
   model        String?
   serialNumber String?
   purchaseDate DateTime?
-  isActive     Boolean       @default(true)
-  createdAt    DateTime      @default(now())
+  isActive     Boolean         @default(true)
+  createdAt    DateTime        @default(now())
 
   serviceLogs ServiceLog[]
 
@@ -661,8 +661,8 @@ model ServiceLog {
 // ============================================================================
 
 model WorkOrder {
-  id          String          @id @default(cuid())
-  woNumber    String          @unique
+  id          String         @id @default(cuid())
+  woNumber    String         @unique
   jobId       String?
   customerId  String?
   title       String
@@ -671,12 +671,12 @@ model WorkOrder {
   city        String
   province    String
   postal      String?
-  priority    Priority        @default(MEDIUM)
+  priority    Priority       @default(MEDIUM)
   status      WorkOrderStatus @default(ASSIGNED)
   scheduledAt DateTime?
   completedAt DateTime?
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
 
   job        Job?        @relation(fields: [jobId], references: [id])
   truckTrips TruckTrip[]
@@ -685,20 +685,20 @@ model WorkOrder {
 }
 
 model TruckTrip {
-  id            String    @id @default(cuid())
-  workOrderId   String
-  driverId      String
-  truckId       String?
-  startTime     DateTime?
-  endTime       DateTime?
-  odometerStart Int?
-  odometerEnd   Int?
-  gpsStart      Json? // { lat: number, lng: number }
-  gpsEnd        Json?
-  photos        String[] // Array of photo URLs
-  signature     String? // Customer signature image URL
-  notes         String?
-  createdAt     DateTime  @default(now())
+  id             String    @id @default(cuid())
+  workOrderId    String
+  driverId       String
+  truckId        String?
+  startTime      DateTime?
+  endTime        DateTime?
+  odometerStart  Int?
+  odometerEnd    Int?
+  gpsStart       Json?     // { lat: number, lng: number }
+  gpsEnd         Json?
+  photos         String[]  // Array of photo URLs
+  signature      String?   // Customer signature image URL
+  notes          String?
+  createdAt      DateTime  @default(now())
 
   workOrder WorkOrder @relation(fields: [workOrderId], references: [id])
   driver    User      @relation(fields: [driverId], references: [id])
@@ -741,11 +741,11 @@ enum Priority {
 }
 
 enum InspectionType {
-  VT // Visual
-  UT // Ultrasonic
-  RT // Radiographic
-  PT // Penetrant
-  MT // Magnetic
+  VT  // Visual
+  UT  // Ultrasonic
+  RT  // Radiographic
+  PT  // Penetrant
+  MT  // Magnetic
 }
 
 enum PoStatus {
