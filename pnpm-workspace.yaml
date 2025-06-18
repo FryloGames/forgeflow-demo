@@ -1,6 +1,8 @@
 packages:
-  - "apps/*"        # ← every folder inside apps/ is its own workspace
-  - "packages/*"    # ← optional shared libs later
+  - apps/*
+  - packages/*
 
 onlyBuiltDependencies:
-  - "@prisma/client"
+  - '@nestjs/core'
+  - '@prisma/client'
+  - prisma
